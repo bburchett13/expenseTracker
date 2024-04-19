@@ -1,72 +1,101 @@
-let newExpense;
-let expenses = [];
-let expenseName = document.querySelector('#expenseName');
-let expenseDate = document.querySelector('#expenseDate');
-let expenseCategory = document.querySelector('#expenseCategory');
-let expenseValue = document.querySelector('#expenseValue');
-let expenseDescription = document.querySelector('#expenseDescription');
-let expenseList = document.querySelector('#expenseList');
+// Initial Expense List
+let expenseList = [
+    {type: 0, name: "rent", amount: 1200},
+    {type: 1, name: "income", amount: 1700}
 
-let submit = document.querySelector("#submit");
-submit.addEventListener('click', () => {
-    newExpense = new expense(expenseName.value, expenseDate.value, expenseCategory.value, expenseValue.value, expenseDescription.value);
-    expenses.push(newExpense);
-    showExpenses(newExpense);
+];
 
+// Function to update expense summary
+function updateSummary() { 
+    let totalIncome = expenseList.reduce((income, expense) => { 
+        if (expense.type === 1) income += expense.amount; 
+        return income; 
+    }, 0); 
+    let totalExpense = expenseList.reduce((exp, expense) => { 
+        if (expense.type === 0) exp += expense.amount; 
+        return exp; 
+    }, 0); 
+    updatedInc.innerText = totalIncome; 
+    updatedExp.innerText = totalExpense; 
+    updatedBal.innerText = totalIncome - totalExpense; 
+} 
 
-});
+// Function to add row to expense table
+function addItem() { 
+    let type = itemType.value; 
+    let name = document.getElementById("name"); 
+    let amount = document.getElementById("amount"); 
+  
+    // Input validation 
+    if (name.value === "" || Number(amount.value) === 0) 
+        return alert("Incorrect Input"); 
+    if (Number(amount.value) <= 0) 
+        return alert( 
+            "Incorrect amount! can't add negative"
+        ); 
+  
+    // Push new data 
+    expenseList.push({ 
+        type: Number(type), 
+        name: name.value, 
+        amount: Number(amount.value), 
+    }); 
+  
+    updateTable(); 
+    name.value = ""; 
+    amount.value = 0; 
+} 
+  
+// Function to load all entry in the expense table 
+function loadItems(expense, i) { 
+    let arrowColor; 
+  
+    let table = document.getElementById("table"); 
+    let row = table.insertRow(i + 1); 
+    let cell0 = row.insertCell(0); 
+    let cell1 = row.insertCell(1); 
+    let cell2 = row.insertCell(2); 
+    let cell3 = row.insertCell(3); 
+    let cell4 = row.insertCell(4); 
+    cell0.innerHTML = i + 1; 
+    cell1.innerHTML = expense.name; 
+    cell2.innerHTML = expense.amount; 
+    cell4.innerHTML = "☒"; 
+    cell4.classList.add('delButton');
+    cell4.addEventListener("click", () => del(expense)); 
+    if (expense.type === 0) { 
+        arrowColor = "red"; 
+        cell3.innerHTML = "Expense"; 
+    } else { 
+        arrowColor = "green"; 
+        cell3.innerHTML = "Income"; 
+    } 
+    cell3.style.color = arrowColor; 
+} 
+  
+// Clear the table before updating
+function remove() { 
+    while (table.rows.length > 1) table.deleteRow(-1); 
+} 
+  
+// Function to delete a specific expense line item
+function del(removeExpense) { 
+    remove(); 
+    expenseList = expenseList.filter( 
+        (expense) => expense.name !== removeExpense.name 
+    ); 
+    expenseList.map((expenses, i) => loadItems(expenses, i)); 
+    updateSummary(); 
+} 
+  
+// To update table to show all entries
+function updateTable() { 
+    remove(); 
+    expenseList.map((expenses, i) => { 
+        loadItems(expenses, i); 
+    }); 
+    updateSummary(); 
+} 
+  
+updateTable();
 
-function expense(name, date, category, value, description) {
-
-    this.name = name;
-    this.date = date;
-    this.category = category;
-    this.value = value;
-    this.description = description;
-
-}
-let nodeName;
-let nodeDate;
-let nodeCategory;
-let nodeValue;
-let nodeDescription;
-function showExpenses(expense) {
-
-    addingExpense = document.createElement('li');
-
-    nodeName = document.createElement('div');
-    nodeName.className = 'listItem';
-    nodeNameContent = document.createTextNode(expense.name);
-    nodeName.appendChild(nodeNameContent);
-
-    nodeDate = document.createElement('div');
-    nodeDate.className = 'listItem';
-    nodeDateContent = document.createTextNode(expense.date)
-    nodeDate.appendChild(nodeDateContent);
-
-    nodeCategory = document.createElement('div');
-    nodeCategory.className = 'listItem';
-    nodeCategoryContent = document.createTextNode(expense.category)
-    nodeCategory.appendChild(nodeCategoryContent);
-
-    nodeValue = document.createElement('div');
-    nodeValue.className = 'listItem';
-    nodeValueContent = document.createTextNode(expense.value)
-    nodeValue.appendChild(nodeValueContent);
-
-    nodeDescription = document.createElement('div');
-    nodeDescription.className = 'listItem';
-    nodeDescriptionContent = document.createTextNode(expense.description)
-    nodeDescription.appendChild(nodeDescriptionContent);
-
-
-    addingExpense.appendChild(nodeName);
-    addingExpense.appendChild(nodeDate);
-    addingExpense.appendChild(nodeCategory);
-    addingExpense.appendChild(nodeValue);
-    addingExpense.appendChild(nodeDescription);
-
-    expenseList.appendChild(addingExpense);
-    
-
-}
